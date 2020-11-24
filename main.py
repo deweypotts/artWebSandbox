@@ -3,13 +3,27 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-@app.route("/home") # 
+@app.route("/") # 
 def home():
     return render_template("home.html")
 
-@app.route("/login") # 
+@app.route("/home") # 
 def login():
-    return "This is the login page!" #
+    return render_template("home.html")
+    
+@app.route("/schedule") # 
+def logout():
+    return render_template("schedule.html")
+
+@app.route("/logout") # 
+def logout():
+    return render_template("logout.html")
+
+@app.route("/login") # 
+def logout():
+    return render_template("login.html")
+
+
 
 
 
