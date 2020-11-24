@@ -31,14 +31,25 @@ import sqlite3
 # connection.close()
 
 app = Flask(__name__)
+app.secret_key = "this_is_a_super_secret_key"
 
-@app.route("/home") # 
+@app.route("/") # 
 def home():
     return render_template("home.html")
     
 @app.route("/schedule") # 
 def schedule():
     return render_template("schedule.html")
+
+@app.route("/createevent", methods=["POST", "GET"]) # 
+def createEvent():
+    if request.method == "POST":
+        newEventName=request.form["eventName"]
+        flash("Your event has been created!")
+        print(newEventName)
+        return redirect(url_for("createEvent"))
+    else:
+        return render_template("createevent.html")
 
 @app.route("/logout") # 
 def logout():
