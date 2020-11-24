@@ -45,11 +45,23 @@ def schedule():
 def createEvent():
     if request.method == "POST":
         newEventName=request.form["eventName"]
+        newArtistName=request.form["artistName"]
+        newDate=request.form["date"]
+        addToDatabase(newEventName, newArtistName, newDate)
+
         flash("Your event has been created!")
-        print(newEventName)
+    
         return redirect(url_for("createEvent"))
     else:
         return render_template("createevent.html")
+
+
+def addToDatabase(eventName, artistName, date):
+    print(eventName)
+    print(artistName)
+    print(date)
+
+
 
 @app.route("/logout") # 
 def logout():
