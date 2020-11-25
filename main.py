@@ -2,34 +2,28 @@ from flask import Flask, redirect, url_for, request, render_template, request, s
 from datetime import timedelta
 import sqlite3
 
-# #define connection and cursor
-# connection = sqlite3.connect('concert_schedule.db')
 
-# #cursor
-# c = connection.cursor()
+# SQlite commands and database def
+CREATE_EVENTS_TABLE = "CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, eventName TEXT, artistName TEXT, date TEXT);"
+ADD_EVENT = "INSERT INTO events (eventName, artistName, date) VALUES(?,?,?);"
+GET_ALL_EVENTS = "SELECT * FROM events;"
 
-# # create table, only need to create once, so commenting out
-# # c.execute("""CREATE TABLE concert_schedule (
-# #     artistName text,
-# #     date text,
-# #     cost integer
-# #     )""")
+def connect():
+    return sqlite3.connect("events.db")
 
-# c.execute("INSERT INTO concert_schedule VALUES('Jack Johnson', 'Nov 24th, 2021', '70')")
-# c.execute("INSERT INTO concert_schedule VALUES('The White Stripes', 'Oct 12th, 2020', '90')")
+def create_tables(connection):
+    with connection:
+        connection.execute(CREATE_EVENTS_TABLE)
 
-# c.execute("SELECT * FROM concert_schedule WHERE artistName='The White Stripes'")
+def add_event(connection, eventName, artistName, date):
+    with connection:
+        return connection.execute(ADD_EVENT, (eventName, artistName, date))
 
-# connection.commit()
+def get_all_events(connection):
+    with connection:
+        return connection.execute(GET_ALL_EVENTS).fetchall()
 
-# c.execute("SELECT * FROM concert_schedule WHERE artistName='The White Stripes'")
-
-# connection.commit()
-
-# print(c.fetchmany(3))
-
-# connection.close()
-
+# Website pages
 app = Flask(__name__)
 app.secret_key = "this_is_a_super_secret_key"
 
@@ -37,31 +31,22 @@ app.secret_key = "this_is_a_super_secret_key"
 def home():
     return render_template("home.html")
     
-@app.route("/schedule") # 
+@app.route("/schedule", methods = ["GET"]) # 
 def schedule():
     return render_template("schedule.html")
 
 @app.route("/createevent", methods=["POST", "GET"]) # 
 def createEvent():
     if request.method == "POST":
-        newEventName=request.form["eventName"]
-        newArtistName=request.form["artistName"]
-        newDate=request.form["date"]
-        addToDatabase(newEventName, newArtistName, newDate)
-
+        connection = connect()
+        create_tables(connection)
+        add_event(connection, request.form["eventName"], request.form["artistName"], request.form["date"])
+        
         flash("Your event has been created!")
     
         return redirect(url_for("createEvent"))
     else:
         return render_template("createevent.html")
-
-
-def addToDatabase(eventName, artistName, date):
-    print(eventName)
-    print(artistName)
-    print(date)
-
-
 
 @app.route("/logout") # 
 def logout():
@@ -74,9 +59,6 @@ def login():
 @app.route("/test") # 
 def test():
     return render_template("test.html")
-
-
-
 
 
 if __name__ == "__main__":
