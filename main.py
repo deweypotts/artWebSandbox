@@ -33,6 +33,12 @@ def home():
     
 @app.route("/schedule", methods = ["GET"]) # 
 def schedule():
+    connection = connect()
+    create_tables(connection)
+    events = get_all_events(connection)
+    
+    for event in events:
+        print (f"Event Name: {event[1]} Artist: {event[2]} Date: {event[3]}")
     return render_template("schedule.html")
 
 @app.route("/createevent", methods=["POST", "GET"]) # 
