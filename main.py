@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request, render_template, request, session, flash
+from flask import Flask, redirect, url_for, request, render_template, request, session, flash, jsonify
 from datetime import timedelta
 import sqlite3
 
@@ -36,10 +36,35 @@ def schedule():
     connection = connect()
     create_tables(connection)
     events = get_all_events(connection)
-    
+    output = {}
     for event in events:
-        print (f"Event Name: {event[1]} Artist: {event[2]} Date: {event[3]}")
-    return render_template("schedule.html")
+        output[event[0]] = {
+            "name": event[1],
+            "artist": event[2],
+            "date": event[3]
+        }
+    # for event in events:
+    #     print (f"Event Name: {event[1]} Artist: {event[2]} Date: {event[3]}")
+    return render_template("schedule.html", context=output)
+
+
+@app.route("/api/schedule", methods=["GET"])  #
+def api_schedule():
+    connection = connect()
+    create_tables(connection)
+    events = get_all_events(connection)
+    output = {}
+    for event in events:
+        output[event[0]] = {
+            "name": event[1],
+            "artist": event[2],
+            "date": event[3]
+        }
+    print(output)
+   #         print(f"Event Name: {event[1]} Artist: {event[2]} Date: {event[3]}")
+    return jsonify(output)
+
+
 
 @app.route("/createevent", methods=["POST", "GET"]) # 
 def createEvent():
@@ -53,6 +78,14 @@ def createEvent():
         return redirect(url_for("createEvent"))
     else:
         return render_template("createevent.html")
+
+@app.route("/api/createevent", methods=["POST"])
+def api_create_event():
+    connection = connect()
+    input = request.json
+    add_event(connection, input['name'], input['artist'], input['date'])
+
+    return jsonify({'OK': '200'})
 
 @app.route("/logout") # 
 def logout():
@@ -68,4 +101,4 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5050)

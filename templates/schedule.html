@@ -2,4 +2,11 @@
 {% block title %}Schedule page{% endblock %}
 {% block content %}
 <h1>Schedule page. Coming soon!</h1>
+    {% for id, event in context.items() %}
+        <p>Event ID: {{ id }}</p>
+        <p>Name: {{ event['name'] }}</p>
+        <p>Artist:  {{ event['artist'] }}</p>
+        <p>Date: {{ event['date'] }}</p>
+        <hr>
+    {% endfor %}
 {% endblock %}
